@@ -44,13 +44,13 @@ def parsing_function_replies():
                 print(f'Nothing has been found on {page_index} page.')
                 return
         else:
-            print(f'This page has not been found, status code of the page: {code.status_code}')
+            print(f'{page_index} page has not been found, status code of the page: {code.status_code}')
             return
 
 
 # Second task
 def parsing_function_app():
-    url_main_1 = 'https://clutch.co/uk/app-developers?page='  # Change uk for us to search for the US companies
+    url_main_1 = 'https://clutch.co/us/app-developers?page='  # Change uk for us to search for the US companies
     url_main_2 = '&related_services=&related_services=field_pp_sl_ecommerce'  # Nothing should be changed here
 
     columns = ['Company name', 'Price']
@@ -84,12 +84,12 @@ def parsing_function_app():
                     app_info_dict[index][columns[1]] = app_prices_list[index]
 
                 data = pd.DataFrame(data=app_info_dict, index=columns).T
-                data.to_csv('uk_companies_info.csv')
+                data.to_csv('us_companies_info.csv')
 
                 print(f'Parsing at page number {page_index} completed successfully!')
                 page_index += 1
         else:
-            print(f'This page has not been found, status code of the page: {code.status_code}')
+            print(f'{page_index} page has not been found, status code of the page: {code.status_code}')
             break
 
     # data = pd.DataFrame(data=app_info_dict, index=columns).T
@@ -97,6 +97,11 @@ def parsing_function_app():
     # data.to_csv('us_companies_info.csv')
 
 
+def convert_csv_to_excel(file_name=None):
+    pd.read_csv(file_name, index_col=0).to_excel(f'{file_name[:2]}_companies_excel.xlsx')
+
+
 if __name__ == '__main__':
-    # parsing_function_replies()
-    parsing_function_app()
+    parsing_function_replies()
+    # parsing_function_app()
+    # convert_csv_to_excel('uk_companies_info.csv')
