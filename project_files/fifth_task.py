@@ -2,7 +2,7 @@ from importing_modules import *
 
 
 def compile_task():
-    files_list = ['yandex_utm', 'mobileapp']
+    files_list = ['forward_stocks_250650', 'yamlfeed1', 'yandex_01', 'yandex_utm', 'mobileapp']
 
     for file in files_list:
         new_warnings_filename = file + '_we1'
@@ -28,7 +28,7 @@ def compile_task():
             if len(found) > 1:
                 if len(soup_code.find_all('category', {'id': found[1].text})) == 0:
                     warnings_list.append(f'No category found [{offers_found[index]["id"]}: {found[1].text}]\n')
-            with open(rf'C:\Users\vladi\Downloads\{new_warnings_filename}.txt', 'w', encoding='utf-8') as open_file_1:
+            with open(f'{new_warnings_filename}.txt', 'w', encoding='utf-8') as open_file_1:
                 open_file_1.writelines(warnings_list)
 
         print()
@@ -40,7 +40,7 @@ def compile_task():
                 # print('Error', index)
                 # print(offers_found[index])
                 warnings_list.append(f'No image found in offer id: {offers_found[index]["id"]}\n')
-                with open(rf'C:\Users\vladi\Downloads\{new_warnings_filename}.txt', 'w',
+                with open(f'{new_warnings_filename}.txt', 'w',
                           encoding='utf-8') as open_file_1:
                     open_file_1.writelines(warnings_list)
 
@@ -50,13 +50,13 @@ def compile_task():
                 # print('Error', index)
                 # print(offers_found[index])
                 warnings_list.append(f'No price found in offer id: {offers_found[index]["id"]}\n')
-                with open(rf'C:\Users\vladi\Downloads\{new_warnings_filename}.txt', 'w',
+                with open(f'{new_warnings_filename}.txt', 'w',
                           encoding='utf-8') as open_file_1:
                     open_file_1.writelines(warnings_list)
 
         # with open(rf'C:\Users\vladi\Downloads\{new_warnings_filename}.txt', 'w', encoding='utf-8') as open_file_1:
         #     open_file_1.writelines(warnings_list)
-        os.startfile(rf'C:\Users\vladi\Downloads\{new_warnings_filename}.txt')
+        os.startfile(f'{new_warnings_filename}.txt')
 
 
 if __name__ == '__main__':
