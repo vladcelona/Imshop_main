@@ -61,3 +61,5 @@ def compile_task():
 
 if __name__ == '__main__':
     compile_task()
+    print('First task completed!', end='\n')
+    print('-=' * 20, end='\n')

@@ -6,20 +6,22 @@ def compile_task():
     warnings_list = []
 
     code = requests.get(url_main)
+    # with open(r'C:\Users\vladi\Downloads\forward_stocks_250650.xml', 'r', encoding='utf-8') as open_file:
+    #     code = ''.join(open_file.readlines())
     soup_code = bs(code.text, 'lxml')
 
     offers_found = soup_code.find_all('offer')
-    products_found = soup_code.find_all('product')
-    print(len(offers_found))
 
-    products_set = set()
-
-    count = 0
+    count_0 = 0
+    count_1 = 0
     for index in range(len(offers_found)):
-        if offers_found[index].find('quantity').text == '0':
-            count += 1
+        if offers_found[index]['available'] == 'true':
+            count_0 += 1
+        if int(offers_found[index].find('quantity').text) > 0:
+            count_1 += 1
 
-    print(count)
+    print(count_0)
+    print(count_1)
 
     # for index in range(len(offers_found)):
     #     print(index, end=' ')
@@ -56,3 +58,9 @@ def compile_task():
     #             open_file_1.writelines(warnings_list)
     #
     # os.startfile('forward_errors.txt')
+
+
+if __name__ == '__main__':
+    compile_task()
+    print('First task completed!', end='\n')
+    print('-=' * 20, end='\n')
