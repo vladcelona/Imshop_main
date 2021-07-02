@@ -82,7 +82,7 @@ def compile_task():
         file_name = 'file_name_for_parsing.xml'
     # file_size = os.stat(file_name).st_size
 
-    # file_name = r'C:\Users\vladi\Downloads\Telegram Desktop\yandex_utm.xml'
+    # file_name = r'C:\Users\vladi\Downloads\Telegram Desktop\yamlfeed1.xml'
 
     try:
         tree = et.parse(file_name)
@@ -132,7 +132,8 @@ def compile_task():
     def find_string(offer_id):
         nonlocal code, first_index
         for index in range(first_index, len(code)):
-            if f'{offer_id}' in code[index] and '<offer' in code[index]:
+            if (f'{offer_id}' in code[index] and '<offer' in code[index]) or index == len(code):
+                first_index = index
                 return index + 1
 
     def find_categories(category_id):
@@ -141,7 +142,10 @@ def compile_task():
         count = 0
         for category in all_categories_found:
             if category.get('id') == category_id:
-                count += 1
+                count = 1
+                if category.get('parentId') is None:
+                    warnings_append(default_string + "ParentId отсутствует")
+                return
         if count == 0:
             errors_append(default_string + "Категория не представлена")
 
@@ -172,8 +176,8 @@ def compile_task():
         find_categories(category_id_found)
 
         offer_id = offers_found_index.get('id')
-        # offer_line = str(find_string(offer_id))
-        offer_line = ' '
+        offer_line = str(find_string(offer_id))
+        # offer_line = ' '
 
         default_string = f"ID {offer_id} (Строка {offer_line}): "
 
