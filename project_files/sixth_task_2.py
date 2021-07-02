@@ -121,9 +121,17 @@ def compile_task():
     with open(file_name, 'r', encoding='utf-8') as open_file:
         code = open_file.readlines()
 
-    def find_string(offer_id):
+    def find_first():
         nonlocal code
         for index in range(len(code)):
+            if code[index].find('<offer') != -1:
+                return index
+
+    first_index = find_first()
+
+    def find_string(offer_id):
+        nonlocal code, first_index
+        for index in range(first_index, len(code)):
             if f'{offer_id}' in code[index] and '<offer' in code[index]:
                 return index + 1
 
@@ -160,12 +168,16 @@ def compile_task():
     for index_i in tqdm.tqdm(range(len(offers_found.findall('offer'))), ncols=100,
                              ascii=True, leave=True, desc='Offers parsed'):
         offers_found_index = offers_found[index_i]
-        find_categories(offers_found_index.find('categoryId').text)
+        category_id_found = offers_found_index.find('categoryId').text
+        find_categories(category_id_found)
 
         offer_id = offers_found_index.get('id')
-        offer_line = str(find_string(offer_id))
+        # offer_line = str(find_string(offer_id))
+        offer_line = ' '
 
         default_string = f"ID {offer_id} (Строка {offer_line}): "
+
+        # print(index_i, end=' ')
 
         if not len(offers_found_index.findall('price')):
             errors_append(default_string + "Цена")
