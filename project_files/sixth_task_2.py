@@ -1,4 +1,3 @@
-
 from importing_modules import *
 
 
@@ -6,6 +5,8 @@ def download_file(url, verbose=False):
     # # local_filename = os.path.join('.', f"{url.split('/')[-1]}.xml")
     # if url.find(r'C:\Users\vladi') != -1:
     local_filename = os.path.join(f'{url.split("/")[-1]}.xml')
+    if local_filename.count('?') > 0 or local_filename.count('=') > 0:
+        local_filename = 'file_name_for_parsing.xml'
     # else:
     #     local_filename = os.path.join(rf"D:\{url.split('/')[-1]}.xml")
 
@@ -76,25 +77,36 @@ def compile_task():
     # url_main = input('Input url of the page: ')
     download_file(url_main, verbose=True)
     # file_name = f'{url_main.split("/")[-1]}.xml'
-    file_name = f'{url_main.split("/")[-1]}.xml'
+    file_name = os.path.join(f'{url_main.split("/")[-1]}.xml')
+    if file_name.count('?') > 0 or file_name.count('=') > 0:
+        file_name = 'file_name_for_parsing.xml'
     # file_size = os.stat(file_name).st_size
 
-    tree = et.parse(file_name)
-    root = tree.getroot()
+    # file_name = r'C:\Users\vladi\Downloads\Telegram Desktop\yandex_utm.xml'
 
-    offers_errors = []  # 0
-    pictures_errors = []  # 1
-    prices_errors = []  # 2
-    barcode_errors = []  # 3
-    params_errors = []  # 4
-    old_prices_errors = []  # 5
-    retail_prices_errors = []  # 6
-    description_errors = []  # 7
-    rec_errors = []  # 8
-    vat_errors = []  # 9
-    badge_errors = []  # 10
-    video_errors = []  # 11
-    file_errors = []  # 12
+    try:
+        tree = et.parse(file_name)
+        root = tree.getroot()
+    except parse_error:
+        os.remove(file_name)
+        print()
+        print("Error! This file does not have at least one closing element!")
+        print("Soon there will be self-closing elements programme")
+        return
+
+    # offers_errors = []  # 0
+    # pictures_errors = []  # 1
+    # prices_errors = []  # 2
+    # barcode_errors = []  # 3
+    # params_errors = []  # 4
+    # old_prices_errors = []  # 5
+    # retail_prices_errors = []  # 6
+    # description_errors = []  # 7
+    # rec_errors = []  # 8
+    # vat_errors = []  # 9
+    # badge_errors = []  # 10
+    # video_errors = []  # 11
+    # file_errors = []  # 12
 
     errors_list = []
     warnings_list = []
@@ -104,29 +116,30 @@ def compile_task():
     warnings_file_dir = 'feed_warnings.txt'
     infos_file_dir = 'feed_infos.txt'
 
+    all_categories_found = root[0].findall('categories')[0].findall('category')
+
     with open(file_name, 'r', encoding='utf-8') as open_file:
         code = open_file.readlines()
 
-    def find_string(code, offer_id):
+    def find_string(offer_id):
+        nonlocal code
         for index in range(len(code)):
             if f'{offer_id}' in code[index] and '<offer' in code[index]:
                 return index + 1
 
     def find_categories(category_id):
-        nonlocal root, offers_found
-        nonlocal errors_list, warnings_list, infos_list
+        nonlocal offer_id, offer_line, errors_append
+        nonlocal errors_list, all_categories_found, default_string
         count = 0
-        for categories in root[0].findall('categories'):
-            for category in categories.findall('category'):
-                if category.get('id') == category_id: count += 1
+        for category in all_categories_found:
+            if category.get('id') == category_id:
+                count += 1
         if count == 0:
-            errors_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                               f"{find_string(code, offers_found[index_i].get('id'))})"
-                               f": Категория не представлена")
+            errors_append(default_string + "Категория не представлена")
 
-    def find_prices(price):
-        if price is None:
-            print("Error! No price found")
+    # def find_prices(price):
+    #     if price is None:
+    #         print("Error! No price found")
 
     # def write_info_file():
     #     nonlocal errors_file_dir, warnings_file_dir, infos_file_dir
@@ -140,36 +153,47 @@ def compile_task():
 
     # def find_prices(price):
     offers_found = root[0].findall('offers')[0]
-    for index_i in tqdm.tqdm(range(len(offers_found.findall('offer'))), ncols=100, ascii=True, leave=True):
-        find_categories(offers_found[index_i].find('categoryId').text)
-        # print(offer.find('categoryId').text)
-        offer_id = offers_found[index_i].get('id')
-        if len(offers_found[index_i].findall('price')) < 1:
-            errors_list.append(f"ID {offer_id} (Строка qqq666qqq): Цена")
-        if len(offers_found[index_i].findall('picture')) < 1:
-            errors_list.append(f"ID {offer_id} (Строка qqq666qqq): Картинки")
-        if len(offers_found[index_i].findall('barcode')) < 1:
-            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Штрихкоды")
-        if len(offers_found[index_i].findall('param')) < 1:
-            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Параметры")
-        if len(offers_found[index_i].findall('oldPrice')) < 1:
-            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Старые цены")
-        if len(offers_found[index_i].findall('retailPrice')) < 1:
-            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): РРЦ товара")
-        if len(offers_found[index_i].findall('description')) < 1:
-            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Описание товара")
-        if len(offers_found[index_i].findall('rec')) < 1:
-            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): Идентификаторы товаров")
-        if len(offers_found[index_i].findall('vat')) < 1:
-            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Ставка НДС")
-        if len(offers_found[index_i].findall('badge')) < 1:
-            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): Бейджик")
-        if len(offers_found[index_i].findall('video')) < 1:
-            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): Видео")
-        if len(offers_found[index_i].findall('file')) < 1:
-            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): Файл")
-            # write_info_file()
+    errors_append = errors_list.append
+    warnings_append = warnings_list.append
+    infos_append = infos_list.append
 
+    for index_i in tqdm.tqdm(range(len(offers_found.findall('offer'))), ncols=100,
+                             ascii=True, leave=True, desc='Offers parsed'):
+        offers_found_index = offers_found[index_i]
+        find_categories(offers_found_index.find('categoryId').text)
+
+        offer_id = offers_found_index.get('id')
+        offer_line = str(find_string(offer_id))
+
+        default_string = f"ID {offer_id} (Строка {offer_line}): "
+
+        if not len(offers_found_index.findall('price')):
+            errors_append(default_string + "Цена")
+        if not len(offers_found_index.findall('picture')):
+            errors_append(default_string + "Картинки")
+        if not len(offers_found_index.findall('barcode')):
+            warnings_append(default_string + "Штрихкоды")
+        if not len(offers_found_index.findall('param')):
+            warnings_append(default_string + "Параметры")
+        if not len(offers_found_index.findall('oldPrice')):
+            warnings_append(default_string + "Старые цены")
+        if not len(offers_found_index.findall('retailPrice')):
+            infos_append(default_string + "РРЦ товара")
+        if not len(offers_found_index.findall('description')):
+            warnings_append(default_string + "Описание товара")
+        if not len(offers_found_index.findall('rec')):
+            infos_append(default_string + "Идентификаторы товаров")
+        if not len(offers_found_index.findall('vat')):
+            warnings_append(default_string + "Ставка НДС")
+        if not len(offers_found_index.findall('badge')):
+            infos_append(default_string + "Бейджик")
+        if not len(offers_found_index.findall('video')):
+            infos_append(default_string + "Видео")
+        if not len(offers_found_index.findall('file')):
+            infos_append(default_string + "Файл")
+        if not len(offers_found_index.findall('quantity')):
+            warnings_append(default_string + "Количество")
+            # write_info_file()
 
     # for offer in offers_found.findall('offer'):
     #     print("OK", end=' ')
@@ -188,11 +212,12 @@ def compile_task():
             description = 'Warnings'
         else:
             description = 'Info'
-        for index in tqdm.tqdm(range(len(info_list)), ncols=100, ascii=True, leave=True, desc=description):
-            # info_list[index] = info_list[index].replace('qqq666qqq',
-            #                                             str(find_string(code, info_list[index].split()[1])))
-            info_list[index] = re.sub('qqq666qqq',
-                                      str(find_string(code, info_list[index].split()[1])), info_list[index])
+
+        # for index in tqdm.tqdm(range(len(info_list)), ncols=100, ascii=True, leave=True, desc=description):
+        #     # info_list[index] = info_list[index].replace('{offer_line}',
+        #     #                                             str(find_string(code, info_list[index].split()[1])))
+        #     info_list[index] = re.sub('{offer_line}',
+        #                               str(find_string(code, info_list[index].split()[1])), info_list[index])
 
         return info_list
 
