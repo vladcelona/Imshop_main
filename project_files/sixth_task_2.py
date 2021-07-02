@@ -1,3 +1,4 @@
+
 from importing_modules import *
 
 
@@ -108,7 +109,7 @@ def compile_task():
 
     def find_string(code, offer_id):
         for index in range(len(code)):
-            if code[index].find(f'<offer id="{offer_id}"') != -1:
+            if f'{offer_id}' in code[index] and '<offer' in code[index]:
                 return index + 1
 
     def find_categories(category_id):
@@ -120,72 +121,54 @@ def compile_task():
                 if category.get('id') == category_id: count += 1
         if count == 0:
             errors_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                                 f"{find_string(code, offers_found[index_i].get('id'))})"
-                                 f": Категория не представлена")
+                               f"{find_string(code, offers_found[index_i].get('id'))})"
+                               f": Категория не представлена")
 
     def find_prices(price):
         if price is None:
             print("Error! No price found")
 
-    def write_info_file():
-        nonlocal errors_file_dir, warnings_file_dir, infos_file_dir
-        nonlocal errors_list, warnings_list, infos_list
-        with open(errors_file_dir, 'a') as errors_file:
-            errors_file.write('\n'.join(errors_list))
-        with open(warnings_file_dir, 'a') as warnings_file:
-            warnings_file.writelines('\n'.join(warnings_list))
-        with open(infos_file_dir, 'a') as infos_file:
-            infos_file.writelines('\n'.join(infos_list))
-
-        errors_list.clear()
-        warnings_list.clear()
-        infos_list.clear()
+    # def write_info_file():
+    #     nonlocal errors_file_dir, warnings_file_dir, infos_file_dir
+    #     nonlocal errors_list, warnings_list, infos_list
+    #     with open(errors_file_dir, 'a') as errors_file:
+    #         errors_file.write('\n'.join(errors_list))
+    #     with open(warnings_file_dir, 'a') as warnings_file:
+    #         warnings_file.writelines('\n'.join(warnings_list))
+    #     with open(infos_file_dir, 'a') as infos_file:
+    #         infos_file.writelines('\n'.join(infos_list))
 
     # def find_prices(price):
     offers_found = root[0].findall('offers')[0]
     for index_i in tqdm.tqdm(range(len(offers_found.findall('offer'))), ncols=100, ascii=True, leave=True):
         find_categories(offers_found[index_i].find('categoryId').text)
         # print(offer.find('categoryId').text)
+        offer_id = offers_found[index_i].get('id')
         if len(offers_found[index_i].findall('price')) < 1:
-            errors_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                               f"{find_string(code, offers_found[index_i].get('id'))}): Цена")
+            errors_list.append(f"ID {offer_id} (Строка qqq666qqq): Цена")
         if len(offers_found[index_i].findall('picture')) < 1:
-            errors_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                               f"{find_string(code, offers_found[index_i].get('id'))}): Картинки")
+            errors_list.append(f"ID {offer_id} (Строка qqq666qqq): Картинки")
         if len(offers_found[index_i].findall('barcode')) < 1:
-            warnings_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                                 f"{find_string(code, offers_found[index_i].get('id'))}): Штрихкоды")
+            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Штрихкоды")
         if len(offers_found[index_i].findall('param')) < 1:
-            warnings_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                                 f"{find_string(code, offers_found[index_i].get('id'))}): Параметры")
-        if len(offers_found[index_i].findall('oldprice')) < 1:
-            warnings_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                                 f"{find_string(code, offers_found[index_i].get('id'))}): Старые цены")
+            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Параметры")
+        if len(offers_found[index_i].findall('oldPrice')) < 1:
+            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Старые цены")
         if len(offers_found[index_i].findall('retailPrice')) < 1:
-            infos_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                              f"{find_string(code, offers_found[index_i].get('id'))}): РРЦ товара")
+            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): РРЦ товара")
         if len(offers_found[index_i].findall('description')) < 1:
-            warnings_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                                 f"{find_string(code, offers_found[index_i].get('id'))}): Описание товара")
+            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Описание товара")
         if len(offers_found[index_i].findall('rec')) < 1:
-            infos_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                              f"{find_string(code, offers_found[index_i].get('id'))}): Идентификаторы товаров")
+            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): Идентификаторы товаров")
         if len(offers_found[index_i].findall('vat')) < 1:
-            warnings_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                                 f"{find_string(code, offers_found[index_i].get('id'))}): Ставка НДС")
+            warnings_list.append(f"ID {offer_id} (Строка qqq666qqq): Ставка НДС")
         if len(offers_found[index_i].findall('badge')) < 1:
-            infos_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                              f"{find_string(code, offers_found[index_i].get('id'))}): Бейджик")
+            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): Бейджик")
         if len(offers_found[index_i].findall('video')) < 1:
-            infos_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                              f"{find_string(code, offers_found[index_i].get('id'))}): Видео")
+            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): Видео")
         if len(offers_found[index_i].findall('file')) < 1:
-            infos_list.append(f"ID {offers_found[index_i].get('id')} (Строка "
-                              f"{find_string(code, offers_found[index_i].get('id'))}): Файл")
-
-        if index_i % 10 == 0 and index_i != 0:
-            write_info_file()
-
+            infos_list.append(f"ID {offer_id} (Строка qqq666qqq): Файл")
+            # write_info_file()
 
 
     # for offer in offers_found.findall('offer'):
@@ -197,12 +180,28 @@ def compile_task():
     # os.remove(warnings_file_dir)
     # os.remove(infos_file_dir)
 
-    # with open(errors_file_dir, 'w') as errors_file:
-    #     errors_file.write('\n'.join(errors_list))
-    # with open(warnings_file_dir, 'w') as warnings_file:
-    #     warnings_file.writelines('\n'.join(warnings_list))
-    # with open(infos_file_dir, 'w') as infos_file:
-    #     infos_file.writelines('\n'.join(infos_list))
+    def replace_elements(info_list, info_type):
+        description = ''
+        if info_type == 'feed_errors.txt':
+            description = 'Errors'
+        elif info_type == 'feed_warnings.txt':
+            description = 'Warnings'
+        else:
+            description = 'Info'
+        for index in tqdm.tqdm(range(len(info_list)), ncols=100, ascii=True, leave=True, desc=description):
+            # info_list[index] = info_list[index].replace('qqq666qqq',
+            #                                             str(find_string(code, info_list[index].split()[1])))
+            info_list[index] = re.sub('qqq666qqq',
+                                      str(find_string(code, info_list[index].split()[1])), info_list[index])
+
+        return info_list
+
+    with open(errors_file_dir, 'w') as errors_file:
+        errors_file.write('\n'.join(replace_elements(errors_list, errors_file_dir)))
+    with open(warnings_file_dir, 'w') as warnings_file:
+        warnings_file.writelines('\n'.join(replace_elements(warnings_list, warnings_file_dir)))
+    with open(infos_file_dir, 'w') as infos_file:
+        infos_file.writelines('\n'.join(replace_elements(infos_list, infos_file_dir)))
 
     # if len(errors_list) != 0:
     #     print("Errors: ")
