@@ -1,4 +1,3 @@
-
 from importing_modules import *
 
 
@@ -83,6 +82,8 @@ def compile_task():
         file_name = 'file_name_for_parsing.xml'
     # file_size = os.stat(file_name).st_size
 
+    default_line = -1
+
     # file_name = r'C:\Users\Vlad04\Downloads\Telegram Desktop\mobileapp.xml'
 
     try:
@@ -113,25 +114,17 @@ def compile_task():
     warnings_list = []
     infos_list = []
 
-    errors_file_dir = 'feed_errors.txt'
-    warnings_file_dir = 'feed_warnings.txt'
-    infos_file_dir = 'feed_infos.txt'
+    errors_file_dir = 'feed_errors_1.txt'
+    warnings_file_dir = 'feed_warnings_1.txt'
+    infos_file_dir = 'feed_infos_1.txt'
 
     all_categories_found = root[0].findall('categories')[0].findall('category')
     # all_ids_found = root[0].findall('availability')[0].findall('product')
 
     all_categories_found_list = []
 
-    with open(file_name, 'r', encoding='utf-8') as open_file:
-        code = open_file.readlines()
-
-    def find_first():
-        nonlocal code
-        for index in range(len(code)):
-            if code[index].find('<offer') != -1 and code[index].find('<offers>') == -1:
-                return index
-
-    first_index = find_first()
+    # with open(file_name, 'r', encoding='utf-8') as open_file:
+    #     code = open_file.readlines()
 
     def find_all_ids():
         nonlocal all_categories_found
@@ -142,31 +135,52 @@ def compile_task():
         return categories_list
 
     def all_code_needed():
-        nonlocal file_name
+        nonlocal file_name, default_line
         code_lines = []
-        file_open = open(file_name)
+        found = False
+        file_open = open(file_name, 'r', encoding='utf-8')
         for index, line in enumerate(file_open):
-            if line.find('<offer') != -1:
+            if line.find('<offer') != -1 and not found:
                 code_lines.append(line)
+                found = True
+                if default_line == -1:
+                    default_line = index - 1
+            elif found:
+                code_lines.append(line)
+
+        file_open.close()
 
         return code_lines
 
     all_categories = find_all_ids()
+    code = all_code_needed()
+
+    def find_first():
+        nonlocal code
+        for index in range(len(code)):
+            if code[index].find('<offer') != -1 and code[index].find('<offers>') == -1:
+                return index
+
+    first_index = 0
 
     def find_string(offer_id):
-        nonlocal code, first_index
+        nonlocal code, first_index, default_line
+        prev_first_index = first_index
         for index in range(first_index, len(code)):
             if (f'{offer_id}' in code[index] and '<offer' in code[index]) or index == len(code):
                 first_index = index
                 return index + 1
 
+        first_index = prev_first_index
+        return 0
+
     def find_categories(category_id):
         nonlocal offer_id, offer_line, errors_append, warnings_append
-        nonlocal errors_list, all_categories_found, default_string
+        nonlocal errors_list, all_categories_found, default_string, default_line
 
         count = 0
-        for category in all_categories_found:
-            if category.get('id') == category_id:
+        for category in all_categories:
+            if category == category_id:
                 count += 1
                 if count != 0:
                     all_categories_found_list.append(category_id)
@@ -186,7 +200,6 @@ def compile_task():
     #                 break
     #     if count == 0:
     #         errors_append(default_string + "ID не найдена")
-
 
     # def find_prices(price):
     #     if price is None:
@@ -220,7 +233,7 @@ def compile_task():
         # find_ids()
         # offer_line = ' '
 
-        default_string = f"ID {offer_id} (Строка {offer_line}): "
+        default_string = f"ID {offer_id} (Строка {str(int(offer_line) + default_line + 1)}): "
 
         # print(index_i, end=' ')
 
@@ -301,7 +314,7 @@ def compile_task():
     #     print("Ошибок не найдено")
     #     print()
 
-    os.remove(file_name)
+    # os.remove(file_name)
     os.startfile(errors_file_dir)
     os.startfile(warnings_file_dir)
     os.startfile(infos_file_dir)
@@ -448,3 +461,4 @@ if __name__ == '__main__':
     compile_task()
     print('First task completed!', end='\n')
     print('-=' * 20, end='\n')
+    # https://www.forward-sport.ru/bitrix/catalog_export/forward_stocks_250650.php
