@@ -1,5 +1,65 @@
+from xml.etree.ElementTree import ParseError as parse_error
+from urllib.error import HTTPError as http_error
+from xml.etree import ElementTree as et
+from bs4 import BeautifulSoup as bs
+from urllib.request import urlopen
+from urllib.request import Request
+from googlesearch import search
+from io import open
+import pandas as pd
+import numpy as np
+import requests
+import urllib3
+import tqdm
+import sys
+import os
+import re
+import time
 
-from importing_modules import *
+yml_catalog = False
+yml_catalog_slash = False
+html = False
+html_slash = False
+massiv = []
+
+
+def processing(chunk):
+    global yml_catalog, yml_catalog_slash, html, html_slash, massiv
+    with open('feed.txt', 'wb+') as file:
+        file.write(chunk)
+        file.seek(0)
+        line = file.read().decode('utf-8')
+        if line.find("<yml_catalog>") != -1:
+            yml_catalog = True
+        if line.find("</yml_catalog>") != -1:
+            yml_catalog_slash = True
+        if line.find("<html>") != -1:
+            html = True
+        if line.find("</html>") != -1:
+            html_slash = True
+        x = 0
+        for i in range(line.count("<")):
+            massiv.append(line[line.find("<", x):line.find(">", x) + 1])
+            x = line.find(">", x) + 1
+
+
+def result():
+    global yml_catalog, yml_catalog_slash, html, html_slash, massiv
+    if html == False:
+        print("Не открыт корневой тег yml_body")
+    elif not yml_catalog:
+        print("Не открыт корневой тег yml_catalog")
+    if html_slash == False:
+        print("Не зыкрывает корневой тег body")
+    elif not yml_catalog_slash:
+        print("Не закрыт корневой тег yml_catalog")
+    cyclic_dependence = 0
+    for i in range((len(massiv) // 2) + 1):
+        if massiv[i] in massiv[i + 1:]:
+            print("Присутствует циклическая зависимость с тегом {}".format(massiv[i]))
+            cyclic_dependence += 1
+    if cyclic_dependence == 0:
+        print("Циклические зависимости отсутствуют")
 
 
 def download_file(url, verbose=False):
@@ -39,6 +99,8 @@ def download_file(url, verbose=False):
             for chunk in tqdm.tqdm(code.iter_content(chunk_size=chunk_size), total=num_bars, unit='MB',
                                    desc=local_filename, leave=True, ncols=100, ascii=True):
                 open_file.write(chunk)
+                processing(
+                    chunk)  # ********************************************************************************************************************************************
 
         return
 
@@ -59,6 +121,8 @@ def download_file(url, verbose=False):
             for chunk in tqdm.tqdm(code.iter_content(chunk_size=chunk_size), total=num_bars, unit='MB',
                                    desc=local_filename, leave=True, ncols=100, ascii=True):
                 open_file.write(chunk)
+                processing(
+                    chunk)  # ********************************************************************************************************************************************
 
         return
 
@@ -69,6 +133,8 @@ def download_file(url, verbose=False):
             for chunk in tqdm.tqdm(code.iter_content(chunk_size=8_192), desc=local_filename, total=num_bars,
                                    leave=True, ascii=True, ncols=100):
                 open_file.write(chunk)
+                processing(
+                    chunk)  # ********************************************************************************************************************************************
 
         return
 
@@ -77,189 +143,28 @@ def compile_task():
     url_main = sys.argv[1]
     # url_main = input('Input url of the page: ')
     download_file(url_main, verbose=True)
-    # file_name = f'{url_main.split("/")[-1]}.xml'
-    file_name = os.path.join(f'{url_main.split("/")[-1]}.xml')
+    result()  # ****************************************************************************************************************************************************************
+    file_name = f'{url_main.split("/")[-1]}.xml'
+    # file_name = os.path.join(f'{url_main.split("/")[-1]}.xml')
+    # file_name = 'catalog.xml.xml'
     if file_name.count('?') > 0 or file_name.count('=') > 0:
         file_name = 'file_name_for_parsing.xml'
     # file_size = os.stat(file_name).st_size
 
+    default_line = -1
+
     # file_name = r'C:\Users\Vlad04\Downloads\Telegram Desktop\mobileapp.xml'
 
+    errors_file_dir = 'feed_errors_3.txt'
+    warnings_file_dir = 'feed_warnings_3.txt'
+    infos_file_dir = 'feed_infos_3.txt'
+
     try:
-        tree = et.parse(file_name)
-        root = tree.getroot()
-    except parse_error:
-        os.remove(file_name)
-        print()
-        print("Error! This file does not have at least one closing element!")
-        print("Soon there will be self-closing elements programme")
-        return
-
-    # offers_errors = []  # 0
-    # pictures_errors = []  # 1
-    # prices_errors = []  # 2
-    # barcode_errors = []  # 3
-    # params_errors = []  # 4
-    # old_prices_errors = []  # 5
-    # retail_prices_errors = []  # 6
-    # description_errors = []  # 7
-    # rec_errors = []  # 8
-    # vat_errors = []  # 9
-    # badge_errors = []  # 10
-    # video_errors = []  # 11
-    # file_errors = []  # 12
-
-    errors_list = []
-    warnings_list = []
-    infos_list = []
-
-    errors_file_dir = 'feed_errors.txt'
-    warnings_file_dir = 'feed_warnings.txt'
-    infos_file_dir = 'feed_infos.txt'
-
-    all_categories_found = root[0].findall('categories')[0].findall('category')
-    # all_ids_found = root[0].findall('availability')[0].findall('product')
-
-    all_categories_found_list = []
-
-    with open(file_name, 'r', encoding='utf-8') as open_file:
-        code = open_file.readlines()
-
-    def find_first():
-        nonlocal code
-        for index in range(len(code)):
-            if code[index].find('<offer') != -1 and code[index].find('<offers>') == -1:
-                return index
-
-    first_index = find_first()
-
-    def find_all_ids():
-        nonlocal all_categories_found
-        categories_list = []
-        for category in all_categories_found:
-            categories_list.append(category.get('id'))
-
-        return categories_list
-
-    def all_code_needed():
-        nonlocal file_name
-        code_lines = []
-        file_open = open(file_name)
-        for index, line in enumerate(file_open):
-            if line.find('<offer') != -1:
-                code_lines.append(line)
-
-        return code_lines
-
-    all_categories = find_all_ids()
-
-    def find_string(offer_id):
-        nonlocal code, first_index
-        for index in range(first_index, len(code)):
-            if (f'{offer_id}' in code[index] and '<offer' in code[index]) or index == len(code):
-                first_index = index
-                return index + 1
-
-    def find_categories(category_id):
-        nonlocal offer_id, offer_line, errors_append, warnings_append
-        nonlocal errors_list, all_categories_found, default_string
-
-        count = 0
-        for category in all_categories_found:
-            if category.get('id') == category_id:
-                count += 1
-                if count != 0:
-                    all_categories_found_list.append(category_id)
-                    break
-        if count == 0 and category_id not in all_categories_found_list:
-            errors_append(default_string + "Категория не представлена")
-
-    # def find_ids():
-    #     nonlocal offer_id, offer_line, errors_append
-    #     nonlocal all_ids_found, default_string
-    #
-    #     count = 0
-    #     for id_found in all_ids_found:
-    #         if id_found.get('id') == offer_id:
-    #             count += 1
-    #             if count != 0:
-    #                 break
-    #     if count == 0:
-    #         errors_append(default_string + "ID не найдена")
-
-
-    # def find_prices(price):
-    #     if price is None:
-    #         print("Error! No price found")
-
-    # def write_info_file():
-    #     nonlocal errors_file_dir, warnings_file_dir, infos_file_dir
-    #     nonlocal errors_list, warnings_list, infos_list
-    #     with open(errors_file_dir, 'a') as errors_file:
-    #         errors_file.write('\n'.join(errors_list))
-    #     with open(warnings_file_dir, 'a') as warnings_file:
-    #         warnings_file.writelines('\n'.join(warnings_list))
-    #     with open(infos_file_dir, 'a') as infos_file:
-    #         infos_file.writelines('\n'.join(infos_list))
-
-    # def find_prices(price):
-    offers_found = root[0].findall('offers')[0]
-    errors_append = errors_list.append
-    warnings_append = warnings_list.append
-    infos_append = infos_list.append
-
-    for index_i in tqdm.tqdm(range(len(offers_found.findall('offer'))), ncols=100,
-                             ascii=True, leave=True, desc='Offers parsed'):
-        offers_found_index = offers_found[index_i]
-
-        category_id_found = offers_found_index.find('categoryId').text
-        find_categories(category_id_found)
-
-        offer_id = offers_found_index.get('id')
-        offer_line = str(find_string(offer_id))
-        # find_ids()
-        # offer_line = ' '
-
-        default_string = f"ID {offer_id} (Строка {offer_line}): "
-
-        # print(index_i, end=' ')
-
-        if not len(offers_found_index.findall('price')):
-            errors_append(default_string + "Цена")
-        if not len(offers_found_index.findall('picture')):
-            errors_append(default_string + "Картинки")
-        if not len(offers_found_index.findall('barcode')):
-            warnings_append(default_string + "Штрихкоды")
-        if not len(offers_found_index.findall('param')):
-            warnings_append(default_string + "Параметры")
-        if not len(offers_found_index.findall('oldPrice')) and not len(offers_found_index.findall('oldprice')):
-            warnings_append(default_string + "Старые цены")
-        if not len(offers_found_index.findall('retailPrice')):
-            infos_append(default_string + "РРЦ товара")
-        if not len(offers_found_index.findall('description')):
-            warnings_append(default_string + "Описание товара")
-        if not len(offers_found_index.findall('rec')):
-            infos_append(default_string + "Идентификаторы товаров")
-        if not len(offers_found_index.findall('vat')):
-            warnings_append(default_string + "Ставка НДС")
-        if not len(offers_found_index.findall('badge')):
-            infos_append(default_string + "Бейджик")
-        if not len(offers_found_index.findall('video')):
-            infos_append(default_string + "Видео")
-        if not len(offers_found_index.findall('file')):
-            infos_append(default_string + "Файл")
-        if not len(offers_found_index.findall('quantity')):
-            warnings_append(default_string + "Количество")
-            # write_info_file()
-
-    # for offer in offers_found.findall('offer'):
-    #     print("OK", end=' ')
-
-    print()
-
-    # os.remove(errors_file_dir)
-    # os.remove(warnings_file_dir)
-    # os.remove(infos_file_dir)
+        os.remove(errors_file_dir)
+        os.remove(warnings_file_dir)
+        os.remove(infos_file_dir)
+    except FileNotFoundError:
+        pass
 
     def replace_elements(info_list, info_type):
         description = ''
@@ -278,173 +183,173 @@ def compile_task():
 
         return info_list
 
-    with open(errors_file_dir, 'w') as errors_file:
-        errors_file.write('\n'.join(replace_elements(errors_list, errors_file_dir)))
-    with open(warnings_file_dir, 'w') as warnings_file:
-        warnings_file.writelines('\n'.join(replace_elements(warnings_list, warnings_file_dir)))
-    with open(infos_file_dir, 'w') as infos_file:
-        infos_file.writelines('\n'.join(replace_elements(infos_list, infos_file_dir)))
+    errors_list = []
+    warnings_list = []
+    infos_list = []
 
-    # if len(errors_list) != 0:
-    #     print("Errors: ")
-    #     print(*errors_list, sep='\n')
-    #     print()
-    # if len(warnings_list) != 0:
-    #     print("Warnings: ")
-    #     print(*warnings_list, sep='\n')
-    #     print()
-    # if len(infos_list) != 0:
-    #     print("Info: ")
-    #     print(*infos_list, sep='\n')
-    #     print()
-    # if len(errors_list) == 0 and len(warnings_list) == 0 and len(infos_list) == 0:
-    #     print("Ошибок не найдено")
-    #     print()
+    errors_append = errors_list.append
+    warnings_append = warnings_list.append
+    infos_append = infos_list.append
 
-    os.remove(file_name)
+    ids_dict = {elem.split()[0]: elem.split()[2] for elem in
+                open(r"C:\Users\nik\Downloads\telegram Desktop\lines_found.txt").readlines()}
+
+    try:
+        errors_file = open(errors_file_dir, 'a', encoding='utf-8')
+        errors_write = errors_file.write
+
+        ids_list = []
+        root = ' '
+        tree = et.iterparse(file_name, events=('start', 'end'))
+        for index, (event, elem) in tqdm.tqdm(enumerate(tree), ncols=100, leave=True):
+            if index == 0:
+                root = elem
+            if event == 'end' and elem.tag == 'category':
+                ids_list.append(elem.get('id'))
+            if event == 'end' and elem.tag == 'offer':
+                try:
+                    default_string = f"ID {elem.get('id')} (Строка {ids_dict[elem.get('id')]}): ["
+                except KeyError:
+                    default_string = f"ID {elem.get('id')}: ["
+                if elem.find('categoryId').text not in ids_list:
+                    default_string += "Категория, "
+                if not len(elem.findall('price')):
+                    default_string += "Цена, "
+                if not len(elem.findall('picture')):
+                    default_string += "Картинки\n"
+                default_string += ']\n'
+                if '[]' in default_string:
+                    default_string = f"ID {elem.get('id')}: Ошибок не найдено"
+                else:
+                    errors_write(default_string)
+            root.clear()
+            # if len(errors_list) != 0:
+            #     with open(errors_file_dir, 'a') as errors_file:
+            #         errors_file.write(''.join(replace_elements(errors_list, errors_file_dir)))
+            #     errors_list = []
+            # if len(warnings_list) != 0:
+            #     with open(warnings_file_dir, 'a') as warnings_file:
+            #         warnings_file.writelines(''.join(replace_elements(warnings_list, warnings_file_dir)))
+            #     warnings_list = []
+            # if len(infos_list) != 0:
+            #     with open(infos_file_dir, 'a') as infos_file:
+            #         infos_file.writelines(''.join(replace_elements(infos_list, infos_file_dir)))
+            #     infos_list = []
+
+        # print(len(ids_list))
+
+        errors_file.close()
+
+        time.sleep(5)
+
+        warnings_file = open(warnings_file_dir, 'a', encoding='utf-8')
+        warnings_write = warnings_file.write
+
+        ids_list = []
+        root = ' '
+        tree = et.iterparse(file_name, events=('start', 'end'))
+        for index, (event, elem) in tqdm.tqdm(enumerate(tree), ncols=100, leave=True):
+            if index == 0:
+                root = elem
+            if event == 'end' and elem.tag == 'category':
+                ids_list.append(elem.get('id'))
+            if event == 'end' and elem.tag == 'offer':
+                try:
+                    default_string = f"ID {elem.get('id')} (Строка {ids_dict[elem.get('id')]}): ["
+                except KeyError:
+                    default_string = f"ID {elem.get('id')}: ["
+                if not len(elem.findall('barcode')):
+                    default_string += "Штрихкоды, "
+                if not len(elem.findall('param')):
+                    default_string += "Параметры, "
+                if not len(elem.findall('oldPrice')) and not len(elem.findall('oldprice')):
+                    default_string += "Старые цены, "
+                if not len(elem.findall('description')):
+                    default_string += "Описание товара, "
+                if not len(elem.findall('vat')):
+                    default_string += "Ставка НДС, "
+                if not len(elem.findall('quantity')):
+                    default_string += "Количество, "
+                default_string += ']\n'
+                if '[]' in default_string:
+                    default_string = f"ID {elem.get('id')}: Предупреждений не найдено"
+                else:
+                    warnings_write(default_string)
+            root.clear()
+
+        warnings_file.close()
+
+        time.sleep(5)
+
+        infos_file = open(infos_file_dir, 'a', encoding='utf-8')
+        infos_write = infos_file.write
+
+        ids_list = []
+        root = ' '
+        tree = et.iterparse(file_name, events=('start', 'end'))
+        for index, (event, elem) in tqdm.tqdm(enumerate(tree), ncols=100, leave=True):
+            if index == 0:
+                root = elem
+            if event == 'end' and elem.tag == 'category':
+                ids_list.append(elem.get('id'))
+            if event == 'end' and elem.tag == 'offer':
+                try:
+                    default_string = f"ID {elem.get('id')} (Строка {ids_dict[elem.get('id')]}): ["
+                except KeyError:
+                    default_string = f"ID {elem.get('id')}: ["
+                if not len(elem.findall('retailPrice')):
+                    default_string += "РРЦ товара, "
+                if not len(elem.findall('rec')):
+                    default_string += "Идентификаторы товаров, "
+                if not len(elem.findall('badge')):
+                    default_string += "Бейджик, "
+                if not len(elem.findall('video')):
+                    default_string += "Видео, "
+                if not len(elem.findall('file')):
+                    default_string += "Файл, "
+                default_string += ']\n'
+                if '[]' in default_string:
+                    default_string = f"ID {elem.get('id')}: Ошибок не найдено"
+                else:
+                    infos_write(default_string)
+            root.clear()
+
+        infos_file.close()
+    except parse_error:
+        os.remove(file_name)
+        print()
+        print("Error! This file does not have at least one closing element!")
+        print("Soon there will be self-closing elements programme")
+        return
+
+    # with open(file_name, 'r', encoding='utf-8') as open_file:
+    #     index_line = 1
+    #     for line in open_file:
+    #         if '<offer' in line:
+    #             for index in range(len(errors_list)):
+    #                 if (errors_list[index].split()[1]) in line:
+    #                     errors_list[index] = errors_list[index]
+    #             for index in range(len(warnings_list)):
+    #                 if warnings_list[index].split()[1] in line:
+    #                     warnings_list[index] = warnings_list[index]
+    #             for index in range(len(infos_list)):
+    #                 if infos_list[index].split()[1] in line:
+    #                     infos_list[index] = infos_list[index]
+    #         index_line += 1
+
+    # with open(errors_file_dir, 'w') as errors_file:
+    #     errors_file.write(''.join(replace_elements(errors_list, errors_file_dir)))
+    # with open(warnings_file_dir, 'w') as warnings_file:
+    #     warnings_file.writelines(''.join(replace_elements(warnings_list, warnings_file_dir)))
+    # with open(infos_file_dir, 'w') as infos_file:
+    #     infos_file.writelines(''.join(replace_elements(infos_list, infos_file_dir)))
+
+    # os.remove(file_name)
+
     os.startfile(errors_file_dir)
     os.startfile(warnings_file_dir)
     os.startfile(infos_file_dir)
 
-    print("Конец обоработки файла")
-
-
-def division_info_categories():
-    error_string = []
-    warning_string = []
-    info_string = []
-
-
-# def xml_feeds_1():
-#     files_list = ['yandex_utm', 'mobileapp']
-#
-#     for file in files_list:
-#         new_warnings_filename = 'Yandex%20Kiehls' + '_we1'
-#         warnings_list = []
-#         try:
-#             with open('Yandex%20Kiehls.xml.xml', 'r', encoding='utf-8') as open_file:
-#                 code = ''.join(open_file.readlines())
-#         except Exception:
-#             with open('Yandex%20Kiehls.xml.xml', 'r') as open_file:
-#                 code = ''.join(open_file.readlines())
-#
-#         soup_code = bs(code, 'lxml')
-#         offers_found = soup_code.find_all('offer')
-#         print(len(offers_found))
-#
-#         for index in range(len(offers_found)):
-#             print(index, end=' ')
-#             found = offers_found[index].find_all('categoryid')
-#             if len(soup_code.find_all('category', {'id': found[0].text})) == 0:
-#                 warnings_list.append(f'No category found [{offers_found[index]["id"]}: {found[0].text}]\n')
-#             if len(found) > 1:
-#                 if len(soup_code.find_all('category', {'id': found[1].text})) == 0:
-#                     warnings_list.append(f'No category found [{offers_found[index]["id"]}: {found[1].text}]\n')
-#
-#             with open(rf'C:\Users\Vlad04\Downloads\{new_warnings_filename}.txt',
-#                           'w', encoding='utf-8') as open_file_1:
-#                 open_file_1.writelines(warnings_list)
-#
-#         print()
-#         print('Tags are done!')
-#
-#         c = 0
-#         for index in range(len(offers_found)):
-#             if len(offers_found[index].find_all('picture')) < 1:  # Чтобы найти price, просто меняешь picture :D
-#                 # print(offers_found[index].find('categoryid').text)
-#                 # print('Error', index)
-#                 # print(offers_found[index])
-#                 warnings_list.append(f'No image found in offer id: {offers_found[index]["id"]}\n')
-#                 with open(f'{new_warnings_filename}.txt', 'w',
-#                           encoding='utf-8') as open_file_1:
-#                     open_file_1.writelines(warnings_list)
-#
-#         for index in range(len(offers_found)):
-#             if len(offers_found[index].find_all('price')) < 1:  # Чтобы найти price, просто меняешь picture :D
-#                 # print(offers_found[index].find('categoryid').text)
-#                 # print('Error', index)
-#                 # print(offers_found[index])
-#                 warnings_list.append(f'No price found in offer id: {offers_found[index]["id"]}\n')
-#                 with open(f'{new_warnings_filename}.txt', 'w',
-#                           encoding='utf-8') as open_file_1:
-#                     open_file_1.writelines(warnings_list)
-#
-#         # with open(rf'C:\Users\Vlad04\Downloads\{new_warnings_filename}.txt', 'w', encoding='utf-8') as open_file_1:
-#         #     open_file_1.writelines(warnings_list)
-#         os.startfile(f'{new_warnings_filename}.txt')
-
-
-# if __name__ == '__main__':
-# download_file('https://kiehls.ru/media/feed/Yandex%20Kiehls.xml', verbose=True)
-# xml_feeds()
-# xml_feeds_1()
-# <warning>No pictures found</warning>
-# 4945
-# python main.py https://www.forward-sport.ru/bitrix/catalog_export/forward_stocks_250650.php
-
-
-# def compile_task():
-#     url_main = 'https://xn--80ae2aeeogi5fxc.xn--p1ai/feed/yml/imshop_catalog'
-#     warnings_list = []
-#
-#     # code = requests.get(url_main)
-#     with open(r'C:\Users\vladi\Downloads\imshop_catalog.xml', 'r', encoding='utf-8') as open_file:
-#         code = ''.join(open_file.readlines())
-#     print('Downloaded')
-#     soup_code = bs(code, 'lxml')
-#     print('Parsed')
-#
-#     offers_found = soup_code.find_all('offer')
-#
-#     # count_0 = 0
-#     # count_1 = 0
-#     # for index in range(len(offers_found)):
-#     #     if offers_found[index]['available'] == 'true':
-#     #         count_0 += 1
-#     #     if int(offers_found[index].find('quantity').text) > 0:
-#     #         count_1 += 1
-#     #
-#     # print(count_0)
-#     # print(count_1)
-#
-#     for index in range(len(offers_found)):
-#         print(index, end=' ')
-#         found = offers_found[index].find_all('categoryid')
-#         if len(soup_code.find_all('category', {'id': found[0].text})) == 0:
-#             warnings_list.append(f'No category found [{offers_found[index]["id"]}: {found[0].text}]\n')
-#         if len(found) > 1:
-#             if len(soup_code.find_all('category', {'id': found[1].text})) == 0:
-#                 warnings_list.append(f'No category found [{offers_found[index]["id"]}: {found[1].text}]\n')
-#         with open(f'forward_errors_1.txt', 'w', encoding='utf-8') as open_file_1:
-#             open_file_1.writelines(warnings_list)
-#
-#     print()
-#     print('Tags are done!')
-#
-#     for index in range(len(offers_found)):
-#         if len(offers_found[index].find_all('picture')) < 1:  # Чтобы найти price, просто меняешь picture :D
-#             # print(offers_found[index].find('categoryid').text)
-#             # print('Error', index)
-#             # print(offers_found[index])
-#             warnings_list.append(f'No image found in offer id: {offers_found[index]["id"]}\n')
-#             with open(f'forward_errors_1.txt', 'w',
-#                       encoding='utf-8') as open_file_1:
-#                 open_file_1.writelines(warnings_list)
-#
-#     for index in range(len(offers_found)):
-#         if len(offers_found[index].find_all('price')) < 1:  # Чтобы найти price, просто меняешь picture :D
-#             # print(offers_found[index].find('categoryid').text)
-#             # print('Error', index)
-#             # print(offers_found[index])
-#             warnings_list.append(f'No price found in offer id: {offers_found[index]["id"]}\n')
-#             with open(f'forward_errors_1.txt', 'w',
-#                       encoding='utf-8') as open_file_1:
-#                 open_file_1.writelines(warnings_list)
-#
-#     os.startfile('forward_errors_1.txt')
-
 
 if __name__ == '__main__':
     compile_task()
-    print('First task completed!', end='\n')
-    print('-=' * 20, end='\n')

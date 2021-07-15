@@ -1,4 +1,3 @@
-
 from importing_modules import *
 
 
@@ -75,14 +74,18 @@ def download_file(url, verbose=False):
 
 def compile_task():
     url_main = sys.argv[1]
+    file_name = ''
+    if r'C:\Users' in url_main:
+        file_name = rf'{url_main}'
     # url_main = input('Input url of the page: ')
-    download_file(url_main, verbose=True)
-    file_name = f'{url_main.split("/")[-1]}.xml'
-    # file_name = os.path.join(f'{url_main.split("/")[-1]}.xml')
-    # file_name = 'catalog.xml.xml'
-    if file_name.count('?') > 0 or file_name.count('=') > 0:
-        file_name = 'file_name_for_parsing.xml'
-    # file_size = os.stat(file_name).st_size
+    else:
+        download_file(url_main, verbose=True)
+        file_name = f'{url_main.split("/")[-1]}.xml'
+        # file_name = os.path.join(f'{url_main.split("/")[-1]}.xml')
+        # file_name = 'catalog.xml.xml'
+        if file_name.count('?') > 0 or file_name.count('=') > 0:
+            file_name = 'file_name_for_parsing.xml'
+        # file_size = os.stat(file_name).st_size
 
     default_line = -1
 
@@ -120,11 +123,14 @@ def compile_task():
     warnings_list = []
     infos_list = []
 
+    # print(open(file_name, 'r', encoding='utf-8').readlines())
+
     errors_append = errors_list.append
     warnings_append = warnings_list.append
     infos_append = infos_list.append
 
-    ids_dict = {elem.split()[0]: elem.split()[2] for elem in open("lines_found.txt").readlines()}
+    # ids_dict = {elem.split()[0]: elem.split()[2] for elem in open(r"C:\Users\vladi\lines_file.txt").readlines()}
+    ids_dict = {}
 
     try:
         errors_file = open(errors_file_dir, 'a', encoding='utf-8')
@@ -143,14 +149,42 @@ def compile_task():
                     default_string = f"ID {elem.get('id')} (Строка {ids_dict[elem.get('id')]}): ["
                 except KeyError:
                     default_string = f"ID {elem.get('id')}: ["
+                default_string += '\n\tКритические ошибки: '
                 if elem.find('categoryId').text not in ids_list:
                     default_string += "Категория, "
                 if not len(elem.findall('price')):
                     default_string += "Цена, "
                 if not len(elem.findall('picture')):
                     default_string += "Картинки\n"
-                default_string += ']\n'
-                if '[]' in default_string:
+                if default_string.find('Категория') == -1 and default_string.find('Цена') == -1 and \
+                    default_string.find('Картинки') == -1:
+                    default_string += 'Не найдено'
+                default_string += '\n\tПредупреждения: '
+                if not len(elem.findall('barcode')):
+                    default_string += "Штрихкоды, "
+                if not len(elem.findall('param')):
+                    default_string += "Параметры, "
+                if not len(elem.findall('oldPrice')) and not len(elem.findall('oldprice')):
+                    default_string += "Старые цены, "
+                if not len(elem.findall('description')):
+                    default_string += "Описание товара, "
+                if not len(elem.findall('vat')):
+                    default_string += "Ставка НДС, "
+                if not len(elem.findall('quantity')):
+                    default_string += "Количество, "
+                default_string += '\n\tДоп. контент: '
+                if not len(elem.findall('retailPrice')):
+                    default_string += "РРЦ товара, "
+                if not len(elem.findall('rec')):
+                    default_string += "Идентификаторы товаров, "
+                if not len(elem.findall('badge')):
+                    default_string += "Бейджик, "
+                if not len(elem.findall('video')):
+                    default_string += "Видео, "
+                if not len(elem.findall('file')):
+                    default_string += "Файл, "
+                default_string += '\n]\n'
+                if '[\nКритические ошибки: ]' in default_string:
                     default_string = f"ID {elem.get('id')}: Ошибок не найдено"
                 else:
                     errors_write(default_string)
@@ -172,7 +206,7 @@ def compile_task():
 
         errors_file.close()
 
-        time.sleep(5)
+        # time.sleep(5)
 
         warnings_file = open(warnings_file_dir, 'a', encoding='utf-8')
         warnings_write = warnings_file.write
@@ -190,18 +224,6 @@ def compile_task():
                     default_string = f"ID {elem.get('id')} (Строка {ids_dict[elem.get('id')]}): ["
                 except KeyError:
                     default_string = f"ID {elem.get('id')}: ["
-                if not len(elem.findall('barcode')):
-                    default_string += "Штрихкоды, "
-                if not len(elem.findall('param')):
-                    default_string += "Параметры, "
-                if not len(elem.findall('oldPrice')) and not len(elem.findall('oldprice')):
-                    default_string += "Старые цены, "
-                if not len(elem.findall('description')):
-                    default_string += "Описание товара, "
-                if not len(elem.findall('vat')):
-                    default_string += "Ставка НДС, "
-                if not len(elem.findall('quantity')):
-                    default_string += "Количество, "
                 default_string += ']\n'
                 if '[]' in default_string:
                     default_string = f"ID {elem.get('id')}: Предупреждений не найдено"
@@ -211,7 +233,7 @@ def compile_task():
 
         warnings_file.close()
 
-        time.sleep(5)
+        # time.sleep(5)
 
         infos_file = open(infos_file_dir, 'a', encoding='utf-8')
         infos_write = infos_file.write
@@ -229,16 +251,6 @@ def compile_task():
                     default_string = f"ID {elem.get('id')} (Строка {ids_dict[elem.get('id')]}): ["
                 except KeyError:
                     default_string = f"ID {elem.get('id')}: ["
-                if not len(elem.findall('retailPrice')):
-                    default_string += "РРЦ товара, "
-                if not len(elem.findall('rec')):
-                    default_string += "Идентификаторы товаров, "
-                if not len(elem.findall('badge')):
-                    default_string += "Бейджик, "
-                if not len(elem.findall('video')):
-                    default_string += "Видео, "
-                if not len(elem.findall('file')):
-                    default_string += "Файл, "
                 default_string += ']\n'
                 if '[]' in default_string:
                     default_string = f"ID {elem.get('id')}: Ошибок не найдено"
@@ -248,7 +260,7 @@ def compile_task():
 
         infos_file.close()
     except parse_error:
-        os.remove(file_name)
+        # os.remove(file_name)
         print()
         print("Error! This file does not have at least one closing element!")
         print("Soon there will be self-closing elements programme")

@@ -34,7 +34,7 @@ def download_file(url, verbose=False):
             print(f'Number of bars: {num_bars}')
             # print(dict(num_bars=num_bars))
 
-        with open(local_filename, 'wb') as open_file:
+        with open(local_filename, 'w') as open_file:
             for chunk in tqdm.tqdm(code.iter_content(chunk_size=chunk_size), total=num_bars, unit='MB',
                                    desc=local_filename, leave=True, ncols=100, ascii=True):
                 open_file.write(chunk)
@@ -54,7 +54,7 @@ def download_file(url, verbose=False):
             print(f'Number of bars: {num_bars}')
             # print(dict(num_bars=num_bars))
 
-        with open(local_filename, 'wb') as open_file:
+        with open(local_filename, 'w') as open_file:
             for chunk in tqdm.tqdm(code.iter_content(chunk_size=chunk_size), total=num_bars, unit='MB',
                                    desc=local_filename, leave=True, ncols=100, ascii=True):
                 open_file.write(chunk)
@@ -64,7 +64,7 @@ def download_file(url, verbose=False):
     else:
         file_size = len(code_1.text.split('\n'))
         num_bars = int(file_size / 2 ** 14)
-        with open(local_filename, 'wb') as open_file:
+        with open(local_filename, 'w') as open_file:
             for chunk in tqdm.tqdm(code.iter_content(chunk_size=8_192), desc=local_filename, total=num_bars,
                                    leave=True, ascii=True, ncols=100):
                 open_file.write(chunk)
@@ -134,7 +134,7 @@ def compile_task():
             count += 1
 
         for index, line in enumerate(open(local_file_name, 'r', encoding='utf-8')):
-
+            pass
 
         print()
         all_categories = list(all_categories)
