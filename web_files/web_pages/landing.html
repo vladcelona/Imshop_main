@@ -263,37 +263,73 @@
                 }
             }
 
+            .item-container {
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: space-between;
+            }
+
             .item {
-              width: 200px;
+              width: calc(50% - 10px);
               padding: 10px;
-              background-color: #fff;
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              margin-bottom: 20px;
+              border: 1px solid #ccc;
               border-radius: 5px;
-              margin: 10px;
-              float: left;
+              cursor: pointer;
+                float: left
             }
 
             .item img {
-              display: block;
-              margin: 0 auto;
               max-width: 100px;
               border-radius: 5px;
+              display: block;
+              margin: 0 auto;
             }
 
-            .item .price {
-              font-size: 16px;
+            .popup {
+              display: none;
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(0, 0, 0, 0.5);
+            }
+
+            .popup-content {
+              position: absolute;
+                border-radius: 10px;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background-color: #fff;
+              padding: 20px;
+              max-width: 80%;
+              max-height: 80%;
+              overflow-y: auto;
+            }
+
+            .close-btn {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              font-size: 24px;
+              cursor: pointer;
+            }
+
+            .popup-image {
+              max-width: 100%;
+              border-radius: 5px;
+              display: block;
+              margin: 0 auto 10px;
+            }
+
+            .popup-price {
               font-weight: bold;
-              color: #333;
             }
 
-            .item .description {
-              font-size: 14px;
-              color: #666;
-              margin-top: 5px;
-            }
-
-            div {
-                align-content: center;
+            .popup-description {
+              margin-top: 10px;
             }
 
         </style>
@@ -356,8 +392,17 @@
             <!--=============== CATALOG ===============-->
             <section class="container section section__height" id="catalog">
                 <h2 class="section__title">Catalog</h2>
-                <div class="item-list" id="itemList">
-                    <!-- Items will be dynamically added here -->
+                <div class="item-container" id="itemContainer">
+                <!-- The items will be dynamically generated here using JavaScript -->
+                </div>
+
+                <div class="popup" id="popup">
+                    <div class="popup-content">
+                    <span class="close-btn" id="closeBtn">&times;</span>
+                    <img class="popup-image" id="popupImage" src="" alt="Item Image">
+                    <div class="popup-price" id="popupPrice"></div>
+                    <div class="popup-description" id="popupDescription"></div>
+                    </div>
                 </div>
             </section>
 
@@ -408,56 +453,76 @@
             }
             window.addEventListener('scroll', scrollHeader)
 
-            const itemList = document.getElementById('itemList');
+            /*========================================================*/
+            const itemContainer = document.getElementById('itemContainer');
+            const popup = document.getElementById('popup');
+            const closeBtn = document.getElementById('closeBtn');
+            const popupImage = document.getElementById('popupImage');
+            const popupPrice = document.getElementById('popupPrice');
+            const popupDescription = document.getElementById('popupDescription');
 
-            // Sample data for demonstration purposes (can be replaced with dynamic data)
+            // Sample data for items (you can replace this with your own data)
             const items = [
-              {
-                image: 'https://via.placeholder.com/100',
-                price: '$19.99',
-                description: 'Lorem ipsum dolor sit amet 1',
-              },
-              {
-                image: 'https://via.placeholder.com/100',
-                price: '$14.99',
-                description: 'Lorem ipsum dolor sit amet 2',
-              },
-              {
-                image: 'https://via.placeholder.com/100',
-                price: '$24.99',
-                description: 'Lorem ipsum dolor sit amet 3',
-              },
-              // Add more items here as needed
+                {
+                    image: 'https://via.placeholder.com/100',
+                    price: '$19.99',
+                    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                },
+                {
+                    image: 'https://via.placeholder.com/100',
+                    price: '$29.99',
+                    description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                },
+                {
+                    image: 'https://via.placeholder.com/100',
+                    price: '$109.99',
+                    description: 'Sed do eiusmod tempor Lorem ipsum dolor sit amet',
+                },
+                {
+                    image: 'https://via.placeholder.com/100',
+                    price: '$209.99',
+                    description: 'Sed do eiusmod tempor Lorem ipsum dolor sit amet',
+                },
+                {
+                    image: 'https://via.placeholder.com/100',
+                    price: '$9.99',
+                    description: 'Sed do eiusmod tempor Lorem ipsum dolor sit amet',
+                }
+              // Add more items here
             ];
 
-            // Function to create and append a new item to the list
-            function addItemToDOM(item) {
-              const itemDiv = document.createElement('div');
-              itemDiv.classList.add('item');
-
-              const itemImage = document.createElement('img');
-              itemImage.src = item.image;
-              itemDiv.appendChild(itemImage);
-
-              const itemPrice = document.createElement('p');
-              itemPrice.classList.add('price');
-              itemPrice.textContent = item.price;
-              itemDiv.appendChild(itemPrice);
-
-              const itemDescription = document.createElement('p');
-              itemDescription.textContent = item.description;
-              itemDiv.appendChild(itemDescription);
-
-              itemList.appendChild(itemDiv);
+            // Function to create item elements and add click event listener
+            function createItem(itemData) {
+              const item = document.createElement('div');
+              item.className = 'item';
+              item.innerHTML = `
+                <img src="${itemData.image}" alt="Item Image">
+                <div class="price">${itemData.price}</div>
+                <div class="description">${itemData.description}</div>
+              `;
+              item.addEventListener('click', () => showPopup(itemData));
+              return item;
             }
 
-            // Generating items on page load
-            window.addEventListener('load', () => {
-              // For demonstration, using the sample items data
-              items.forEach((item) => {
-                addItemToDOM(item);
-              });
+            // Function to show the popup with item information
+            function showPopup(itemData) {
+              popupImage.src = itemData.image;
+              popupPrice.textContent = itemData.price;
+              popupDescription.textContent = itemData.description;
+              popup.style.display = 'block';
+            }
+
+            // Close the popup when the close button is clicked
+            closeBtn.addEventListener('click', () => {
+              popup.style.display = 'none';
             });
+
+            // Generate items and append them to the container
+            items.forEach(itemData => {
+              const itemElement = createItem(itemData);
+              itemContainer.appendChild(itemElement);
+            });
+
 
         </script>
     </body>
