@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!--=============== BOXICONS ===============-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+        <!--=============== CSS ===============-->
+        <link rel="stylesheet" href="/web_files/styles.css">
+
+        <title>Responsive bottom navigation</title>
+    </head>
+    <body>
+        <!--=============== HEADER ===============-->
+        <header class="header" id="header">
+            <nav class="nav container">
+                <a href="#" class="nav__logo">Marlon</a>
+
+                <div class="nav__menu" id="nav-menu">
+                    <ul class="nav__list">
+                        <li class="nav__item">
+                            <a href="#showcase" class="nav__link active-link">
+                                <i class='bx bx-home-alt nav__icon'></i>
+                                <span class="nav__name">Showcase</span>
+                            </a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a href="#catalog" class="nav__link">
+                                <i class='bx bx-user nav__icon'></i>
+                                <span class="nav__name">Catalog</span>
+                            </a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a href="#shopping_cart" class="nav__link">
+                                <i class='bx bx-book-alt nav__icon'></i>
+                                <span class="nav__name">Shopping cart</span>
+                            </a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a href="favorites.html" class="nav__link">
+                                <i class='bx bx-briefcase-alt nav__icon'></i>
+                                <span class="nav__name">Favorites</span>
+                            </a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a href="profile.html" class="nav__link">
+                                <i class='bx bx-message-square-detail nav__icon'></i>
+                                <span class="nav__name">Profile</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <img src="assets/img/perfil.png" alt="" class="nav__img">
+            </nav>
+        </header>
+
+        <main>
+            <!--=============== SHOWCASE ===============-->
+            <section class="container section section__height" id="showcase">
+                <h2 class="section__title">Showcase</h2>
+            </section>
+
+            <!--=============== CATALOG ===============-->
+            <section class="container section section__height" id="catalog">
+                <h2 class="section__title">Catalog</h2>
+            </section>
+
+            <!--=============== SHOPPING CART ===============-->
+            <section class="container section section__height" id="shopping_cart">
+                <h2 class="section__title">Shopping cart</h2>
+            </section>
+        </main>
+
+        <!--=============== MAIN JS ===============-->
+        <script src="/web_files/main.js"></script>
+    </body>
+</html>
