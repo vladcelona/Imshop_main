@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-    <html lang="en">
+    <html lang="en-US">
     <head>
+        <script src="https://telegram.org/js/telegram-web-app.js"></script>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
         <!--=============== BOXICONS ===============-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
@@ -17,13 +19,12 @@
           --header-height: 3rem;
 
           /*========== Colors ==========*/
-          --hue: 174;
           --sat: 63%;
-          --first-color: hsl(var(--hue), var(--sat), 40%);
-          --first-color-alt: hsl(var(--hue), var(--sat), 36%);
-          --title-color: hsl(var(--hue), 12%, 15%);
-          --text-color: hsl(var(--hue), 8%, 35%);
-          --body-color: hsl(var(--hue), 100%, 99%);
+          --first-color: hsl(var(--tg-theme-button-color), var(--sat), 40%);
+          --first-color-alt: hsl(var(--tg-theme-button-color), var(--sat), 36%);
+          --title-color: hsl(var(--tg-theme-button-color), 12%, 15%);
+          --text-color: hsl(var(--tg-theme-button-color), 8%, 35%);
+          --body-color: hsl(var(--tg-theme-button-color), 100%, 99%);
           --container-color: #FFF;
 
           /*========== Font and typography ==========*/
@@ -134,7 +135,7 @@
             bottom: 0;
             left: 0;
             background-color: var(--container-color);
-            box-shadow: 0 -1px 12px hsla(var(--hue), var(--sat), 15%, 0.15);
+            box-shadow: 0 -1px 12px hsla(var(--tg-theme-button-color), var(--sat), 15%, 0.15);
             width: 100%;
             height: 4rem;
             padding: 0 1rem;
@@ -191,7 +192,7 @@
 
         /* Change background header */
         .scroll-header {
-          box-shadow: 0 1px 12px hsla(var(--hue), var(--sat), 15%, 0.15);
+          box-shadow: 0 1px 12px hsla(var(--tg-theme-button-color), var(--sat), 15%, 0.15);
         }
 
         /*=============== MEDIA QUERIES ===============*/
@@ -307,8 +308,6 @@
                         </li>
                     </ul>
                 </div>
-
-                <img src="assets/img/perfil.png" alt="" class="nav__img">
             </nav>
         </header>
 
@@ -342,7 +341,7 @@
         <!--=============== MAIN JS ===============-->
         <script>
             /*=============== SCROLL SECTIONS ACTIVE LINK ===============*/
-            const sections= document.querySelectorAll('section[id]')
+            const sections = document.querySelectorAll('section[id]')
 
             function scrollActive(){
                 const scrollY = window.pageYOffset
