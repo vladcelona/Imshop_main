@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-    <html lang="en-US">
+    <html lang="en">
     <head>
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
         <!--=============== BOXICONS ===============-->
@@ -16,259 +16,295 @@
 
         /*=============== VARIABLES CSS ===============*/
         :root {
-          --header-height: 3rem;
+            --header-height: 3rem;
 
-          /*========== Colors ==========*/
-          --sat: 63%;
-          --first-color: hsl(var(--tg-theme-button-color), var(--sat), 40%);
-          --first-color-alt: hsl(var(--tg-theme-button-color), var(--sat), 36%);
-          --title-color: hsl(var(--tg-theme-button-color), 12%, 15%);
-          --text-color: hsl(var(--tg-theme-button-color), 8%, 35%);
-          --body-color: hsl(var(--tg-theme-button-color), 100%, 99%);
-          --container-color: #FFF;
+            /*========== Colors ==========*/
+            --hue: 174;
+            --sat: 63%;
+            --first-color: hsl(var(--hue), var(--sat), 40%);
+            --first-color-alt: hsl(var(--hue), var(--sat), 36%);
+            --title-color: hsl(var(--hue), 12%, 15%);
+            --text-color: hsl(var(--hue), 8%, 35%);
+            --body-color: hsl(var(--hue), 100%, 99%);
+            --container-color: #FFF;
 
-          /*========== Font and typography ==========*/
-          --body-font: 'Open Sans', sans-serif;
-          --h1-font-size: 1.5rem;
-          --normal-font-size: .938rem;
-          --tiny-font-size: .625rem;
+            /*========== Font and typography ==========*/
+            --body-font: 'Open Sans', sans-serif;
+            --h1-font-size: 1.5rem;
+            --normal-font-size: .938rem;
+            --tiny-font-size: .625rem;
 
-          /*========== z index ==========*/
-          --z-tooltip: 10;
-          --z-fixed: 100;
+            /*========== z index ==========*/
+            --z-tooltip: 10;
+            --z-fixed: 100;
         }
 
         @media screen and (min-width: 968px) {
-          :root {
+            :root {
             --h1-font-size: 2.25rem;
             --normal-font-size: 1rem;
-          }
-        }
+            }
+            }
 
-        /*=============== BASE ===============*/
-        * {
-          box-sizing: border-box;
-          padding: 0;
-          margin: 0;
-        }
+            /*=============== BASE ===============*/
+            * {
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0;
+            }
 
-        html {
-          scroll-behavior: smooth;
-        }
+            html {
+                scroll-behavior: smooth;
+            }
 
-        body {
-          margin: var(--header-height) 0 0 0;
-          font-family: var(--body-font);
-          font-size: var(--normal-font-size);
-          background-color: var(--body-color);
-          color: var(--text-color);
-        }
+            body {
+                margin: var(--header-height) 0 0 0;
+                font-family: var(--body-font);
+                font-size: var(--normal-font-size);
+                background-color: var(--body-color);
+                color: var(--text-color);
+            }
 
-        ul {
-          list-style: none;
-        }
+            ul {
+                list-style: none;
+            }
 
-        a {
-          text-decoration: none;
-        }
+            a {
+                text-decoration: none;
+            }
 
-        img {
-          max-width: 100%;
-          height: auto;
-        }
+            img {
+                border-radius: 10px;
+                max-width: 100%;
+                height: auto;
+            }
 
-        /*=============== REUSABLE CSS CLASSES ===============*/
-        .section {
-          padding: 4.5rem 0 2rem;
-        }
+            /*=============== REUSABLE CSS CLASSES ===============*/
+            .section {
+                padding: 4.5rem 0 2rem;
+            }
 
-        .section__title {
-          font-size: var(--h1-font-size);
-          color: var(--title-color);
-          text-align: center;
-          margin-bottom: 1.5rem;
-        }
+            .section__title {
+                font-size: var(--h1-font-size);
+                color: var(--title-color);
+                text-align: center;
+                margin-bottom: 1.5rem;
+            }
 
-        .section__height {
-          height: 100vh;
-        }
+            .section__height {
+                height: 100vh;
+            }
 
-        /*=============== LAYOUT ===============*/
-        .container {
-          max-width: 968px;
-          margin-left: 1rem;
-          margin-right: 1rem;
-        }
+            /*=============== LAYOUT ===============*/
+            .container {
+                max-width: 968px;
+                margin-left: 1rem;
+                margin-right: 1rem;
+            }
 
-        /*=============== HEADER ===============*/
-        .header {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          background-color: var(--container-color);
-          z-index: var(--z-fixed);
-          transition: .4s;
-        }
+            /*=============== HEADER ===============*/
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background-color: var(--container-color);
+                z-index: var(--z-fixed);
+                transition: .4s;
+            }
 
-        /*=============== NAV ===============*/
-        .nav {
-          height: var(--header-height);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
+            /*=============== NAV ===============*/
+            .nav {
+                height: var(--header-height);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
 
-        .nav__img {
-          width: 32px;
-          border-radius: 50%;
-        }
+            .nav__img {
+                width: 32px;
+                border-radius: 50%;
+            }
 
-        .nav__logo {
-          color: var(--title-color);
-          font-weight: 600;
-        }
+            .nav__logo {
+                color: var(--title-color);
+                font-weight: 600;
+            }
 
-        @media screen and (max-width: 767px) {
-          .nav__menu {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            background-color: var(--container-color);
-            box-shadow: 0 -1px 12px hsla(var(--tg-theme-button-color), var(--sat), 15%, 0.15);
-            width: 100%;
-            height: 4rem;
-            padding: 0 1rem;
-            display: grid;
-            align-content: center;
-            border-radius: 1.25rem 1.25rem 0 0;
-            transition: .4s;
-          }
-        }
+            @media screen and (max-width: 767px) {
+                .nav__menu {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    background-color: var(--container-color);
+                    box-shadow: 0 -1px 12px hsla(var(--hue), var(--sat), 15%, 0.15);
+                    width: 100%;
+                    height: 4rem;
+                    padding: 0 1rem;
+                    display: grid;
+                    align-content: center;
+                    border-radius: 1.25rem 1.25rem 0 0;
+                    transition: .4s;
+                    }
+                }
 
-        .nav__list,
-        .nav__link {
-          display: flex;
-        }
+                .nav__list,
+                .nav__link {
+                    display: flex;
+                }
 
-        .nav__link {
-          flex-direction: column;
-          align-items: center;
-          row-gap: 4px;
-          color: var(--title-color);
-          font-weight: 600;
-        }
+                .nav__link {
+                    flex-direction: column;
+                    align-items: center;
+                    row-gap: 4px;
+                    color: var(--title-color);
+                    font-weight: 600;
+                }
 
-        .nav__list {
-          justify-content: space-around;
-        }
+                .nav__list {
+                    justify-content: space-around;
+                }
 
-        .nav__name {
-          font-size: var(--tiny-font-size);
-          /* display: none;*/ /* Minimalist design, hidden labels */
-        }
+                .nav__name {
+                    font-size: var(--tiny-font-size);
+                    /* display: none;*/ /* Minimalist design, hidden labels */
+                }
 
-        .nav__icon {
-          font-size: 1.5rem;
-        }
+                .nav__icon {
+                    font-size: 1.5rem;
+                }
 
-        /*Active link*/
-        .active-link {
-          position: relative;
-          color: var(--first-color);
-          transition: .3s;
-        }
+                /*Active link*/
+                .active-link {
+                    position: relative;
+                    color: var(--first-color);
+                    transition: .3s;
+                }
 
-        /* Minimalist design, active link */
-        /* .active-link::before{
-          content: '';
-          position: absolute;
-          bottom: -.5rem;
-          width: 4px;
-          height: 4px;
-          background-color: var(--first-color);
-          border-radius: 50%;
-        } */
+                /* Minimalist design, active link */
+                /* .active-link::before{
+                content: '';
+                position: absolute;
+                bottom: -.5rem;
+                width: 4px;
+                height: 4px;
+                background-color: var(--first-color);
+                border-radius: 50%;
+                } */
 
-        /* Change background header */
-        .scroll-header {
-          box-shadow: 0 1px 12px hsla(var(--tg-theme-button-color), var(--sat), 15%, 0.15);
-        }
+                /* Change background header */
+                .scroll-header {
+                    box-shadow: 0 1px 12px hsla(var(--hue), var(--sat), 15%, 0.15);
+                }
 
-        /*=============== MEDIA QUERIES ===============*/
-        /* For small devices */
-        /* Remove if you choose, the minimalist design */
-        @media screen and (max-width: 320px) {
-          .nav__name {
-            display: none;
-          }
-        }
+            /*=============== MEDIA QUERIES ===============*/
+            /* For small devices */
+            /* Remove if you choose, the minimalist design */
+            @media screen and (max-width: 320px) {
+                .nav__name {
+                    display: none;
+                }
+            }
 
-        /* For medium devices */
-        @media screen and (min-width: 576px) {
-          .nav__list {
-            justify-content: center;
-            column-gap: 3rem;
-          }
-        }
+            /* For medium devices */
+            @media screen and (min-width: 576px) {
+                .nav__list {
+                    justify-content: center;
+                    column-gap: 3rem;
+                }
+            }
 
-        @media screen and (min-width: 767px) {
-          body {
-            margin: 0;
-          }
-          .section {
-            padding: 7rem 0 2rem;
-          }
-          .nav {
-            height: calc(var(--header-height) + 1.5rem); /* 4.5rem */
-          }
-          .nav__img {
-            display: none;
-          }
-          .nav__icon {
-            display: none;
-          }
-          .nav__name {
-            font-size: var(--normal-font-size);
-            /* display: block; */ /* Minimalist design, visible labels */
-          }
-          .nav__link:hover {
-            color: var(--first-color);
-          }
+            @media screen and (min-width: 767px) {
+                body {
+                    margin: 0;
+                }
+                .section {
+                    padding: 7rem 0 2rem;
+                }
+                .nav {
+                    height: calc(var(--header-height) + 1.5rem); /* 4.5rem */
+                }
+                .nav__img {
+                    display: none;
+                }
+                .nav__icon {
+                    display: none;
+                }
+                .nav__name {
+                    font-size: var(--normal-font-size);
+                /* display: block; */ /* Minimalist design, visible labels */
+                }
+                .nav__link:hover {
+                    color: var(--first-color);
+                }
 
-          /* First design, remove if you choose the minimalist design */
-          .active-link::before {
-            content: '';
-            position: absolute;
-            bottom: -.75rem;
-            width: 4px;
-            height: 4px;
-            background-color: var(--first-color);
-            border-radius: 50%;
-          }
+                /* First design, remove if you choose the minimalist design */
+                .active-link::before {
+                    content: '';
+                    position: absolute;
+                    bottom: -.75rem;
+                    width: 4px;
+                    height: 4px;
+                    background-color: var(--first-color);
+                    border-radius: 50%;
+                }
 
-          /* Minimalist design */
-          /* .active-link::before{
-              bottom: -.75rem;
-          } */
-        }
+                /* Minimalist design */
+                /* .active-link::before{
+                bottom: -.75rem;
+                } */
+            }
 
-        /* For large devices */
-        @media screen and (min-width: 1024px) {
-          .container {
-            margin-left: auto;
-            margin-right: auto;
-          }
-        }
+            /* For large devices */
+            @media screen and (min-width: 1024px) {
+                .container {
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+            }
+
+            .item {
+              width: 200px;
+              padding: 10px;
+              background-color: #fff;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              border-radius: 5px;
+              margin: 10px;
+              float: left;
+            }
+
+            .item img {
+              display: block;
+              margin: 0 auto;
+              max-width: 100px;
+              border-radius: 5px;
+            }
+
+            .item .price {
+              font-size: 16px;
+              font-weight: bold;
+              color: #333;
+            }
+
+            .item .description {
+              font-size: 14px;
+              color: #666;
+              margin-top: 5px;
+            }
+
+            div {
+                align-content: center;
+            }
+
         </style>
 
-        <title>Imshop.io Test Bot</title>
+        <title>Imshop.ai Test Bot</title>
     </head>
     <body>
         <!--=============== HEADER ===============-->
         <header class="header" id="header">
             <nav class="nav container">
-                <a href="#" class="nav__logo">Imshop.io Test Bot</a>
+                <a href="#" class="nav__logo">Imshop.ai Test Bot</a>
 
                 <div class="nav__menu" id="nav-menu">
                     <ul class="nav__list">
@@ -320,6 +356,9 @@
             <!--=============== CATALOG ===============-->
             <section class="container section section__height" id="catalog">
                 <h2 class="section__title">Catalog</h2>
+                <div class="item-list" id="itemList">
+                    <!-- Items will be dynamically added here -->
+                </div>
             </section>
 
             <!--=============== SHOPPING CART ===============-->
@@ -368,6 +407,58 @@
                 if(this.scrollY >= 80) header.classList.add('scroll-header'); else header.classList.remove('scroll-header')
             }
             window.addEventListener('scroll', scrollHeader)
+
+            const itemList = document.getElementById('itemList');
+
+            // Sample data for demonstration purposes (can be replaced with dynamic data)
+            const items = [
+              {
+                image: 'https://via.placeholder.com/100',
+                price: '$19.99',
+                description: 'Lorem ipsum dolor sit amet 1',
+              },
+              {
+                image: 'https://via.placeholder.com/100',
+                price: '$14.99',
+                description: 'Lorem ipsum dolor sit amet 2',
+              },
+              {
+                image: 'https://via.placeholder.com/100',
+                price: '$24.99',
+                description: 'Lorem ipsum dolor sit amet 3',
+              },
+              // Add more items here as needed
+            ];
+
+            // Function to create and append a new item to the list
+            function addItemToDOM(item) {
+              const itemDiv = document.createElement('div');
+              itemDiv.classList.add('item');
+
+              const itemImage = document.createElement('img');
+              itemImage.src = item.image;
+              itemDiv.appendChild(itemImage);
+
+              const itemPrice = document.createElement('p');
+              itemPrice.classList.add('price');
+              itemPrice.textContent = item.price;
+              itemDiv.appendChild(itemPrice);
+
+              const itemDescription = document.createElement('p');
+              itemDescription.textContent = item.description;
+              itemDiv.appendChild(itemDescription);
+
+              itemList.appendChild(itemDiv);
+            }
+
+            // Generating items on page load
+            window.addEventListener('load', () => {
+              // For demonstration, using the sample items data
+              items.forEach((item) => {
+                addItemToDOM(item);
+              });
+            });
+
         </script>
     </body>
 </html>
