@@ -60,7 +60,7 @@
           margin: var(--header-height) 0 0 0;
           font-family: var(--body-font);
           font-size: var(--normal-font-size);
-          background-color: var(--tg-theme-bg-color);
+          background-color: var(--body-color);
           color: var(--text-color);
         }
 
@@ -73,7 +73,7 @@
         }
 
         img {
-          max-width: 70px;
+          max-width: 100%;
           height: auto;
         }
 
@@ -106,7 +106,7 @@
           top: 0;
           left: 0;
           width: 100%;
-          background-color: var(--tg-theme-bg-color);
+          background-color: var(--container-color);
           z-index: var(--z-fixed);
           transition: .4s;
         }
@@ -119,6 +119,11 @@
           align-items: center;
         }
 
+        .nav__img {
+          width: 32px;
+          border-radius: 50%;
+        }
+
         .nav__logo {
           color: var(--title-color);
           font-weight: 600;
@@ -129,7 +134,7 @@
             position: fixed;
             bottom: 0;
             left: 0;
-            background-color: var(--tg-theme-bg-color);
+            background-color: var(--container-color);
             box-shadow: 0 -1px 12px hsla(var(--tg-theme-button-color), var(--sat), 15%, 0.15);
             width: 100%;
             height: 4rem;
@@ -175,7 +180,7 @@
         }
 
         /* Minimalist design, active link */
-        .active-link::before{
+        /* .active-link::before{
           content: '';
           position: absolute;
           bottom: -.5rem;
@@ -183,7 +188,7 @@
           height: 4px;
           background-color: var(--first-color);
           border-radius: 50%;
-        }
+        } */
 
         /* Change background header */
         .scroll-header {
@@ -255,26 +260,15 @@
             margin-right: auto;
           }
         }
-
-        h2 {
-            text-decoration-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-text-color);
-        }
-
-        span {
-            text-decoration-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-color);
-        }
-
         </style>
 
-        <title>Responsive bottom navigation</title>
+        <title>Imshop.io Test Bot</title>
     </head>
     <body>
         <!--=============== HEADER ===============-->
         <header class="header" id="header">
             <nav class="nav container">
-                <a href="#" class="nav__logo">Marlon</a>
+                <a href="#" class="nav__logo">Imshop.io Test Bot</a>
 
                 <div class="nav__menu" id="nav-menu">
                     <ul class="nav__list">
