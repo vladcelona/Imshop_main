@@ -42,6 +42,8 @@ const closeButton = document.getElementById('closeButton');
 const popupImage = document.getElementById('popupImage');
 const popupPrice = document.getElementById('popupPrice');
 const popupDescription = document.getElementById('popupDescription');
+const favoritesButton = document.getElementById('favoritesButton');
+const shoppingCartButton = document.getElementById('shoppingCartButton');
 
 // Properties for closeButton
 closeButton.addEventListener('click', () => {
@@ -52,6 +54,8 @@ closeButton.addEventListener('click', () => {
 
 // Item container for items below
 const itemContainerCatalog = document.getElementById('itemContainerCatalog');
+const itemContainerShoppingCart = document.getElementById('itemContainerShoppingCart');
+const itemContainerFavorites = document.getElementById('itemContainerFavorites');
 
 // Example list of items
 const items = [
@@ -89,14 +93,14 @@ const items = [
         description: 'Sed do eiusmod tempor Lorem ipsum dolor sit amet',
         favorites: false,
         shopping_cart: false,
-    }
+    },
   // Add more items here
 ];
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-= */
 
 // Function for creation of a single item
-function createItem(itemData) {
+function createItem(itemData, index) {
     const item = document.createElement('div');
     item.className = 'list-item';
     item.innerHTML = `
@@ -104,35 +108,105 @@ function createItem(itemData) {
         <div class="item-price">${itemData.price}</div>
         <div class="item-description">${itemData.description}</div>
         <div class="button-row">
-            <button class="shopping-cart-button" id="itemShoppingCartButton">
-                <span class="shopping-cart-text">Add to cart</span>
+            <button class="favorites-button" id="itemShoppingCartButton">
+                <img class="favorites-icon" src="/web_files/image_files/iconmonstr-heart-thin.svg" alt="Heart Icon">
             </button>
-            <button class="favorites-button" id="itemFavoritesButton">
-                <img class="favorites-icon" src="https://raw.githubusercontent.com/vladcelona/Imshop_main/master/web_files/image_files/iconmonstr-heart-thin.svg" alt="Heart Icon">
+            <button class="shopping-cart-button" id="itemFavoritesButton">
+                <span class="shopping-cart-text">Add</span>
             </button>
         </div>
     `;
 
     item.addEventListener('click', function(itemElement) {
         if (itemElement.target.id !== 'itemShoppingCartButton' && itemElement.target.id !== 'itemFavoritesButton') {
-            showPopupWindow(itemData);
+            showPopupWindow(itemData, index);
         }
     });
     return item;
 }
 
-// Adding item to itemContainer
-items.forEach(itemData => {
-    const item = createItem(itemData);
-    itemContainerCatalog.appendChild(item);
-});
+// Adding items to itemContainer
+function generateItemContainerCatalog() {
+    for (var index = 0; index < items.length; index++) {
+        const item = createItem(items[index], index);
+        itemContainerCatalog.appendChild(item);
+    }
+}
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-= */
 
 // Function for showing the content of an item
-function showPopupWindow(itemData) {
+function showPopupWindow(itemData, index) {
     popupWindow.style.display = 'block';
     popupImage.src = itemData.image;
     popupPrice.textContent = itemData.price;
     popupDescription.textContent = itemData.description;
+
+    favoritesButton.addEventListener('click', () => {
+        addToFavorites(itemData, index);
+    });
+
+    shoppingCartButton.addEventListener('click', () => {
+        addToShoppingCart(itemData, index);
+    });
 }
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-= */
+
+function addToFavorites(itemData, index) {
+    if (itemData.favorites === false && document.getElementById(`favorites_${index}`) === null) {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.id = `favorites_${index}`;
+        item.innerHTML = `
+            <img src="${itemData.image}" alt="Example Item Image">
+            <div class="item-price">${itemData.price}</div>
+            <div class="item-description">${itemData.description}</div>
+            <div class="button-row">
+                <button class="favorites-button" id="itemShoppingCartButton">
+                    <img class="favorites-icon" src="/web_files/image_files/iconmonstr-heart-thin.svg" alt="Heart Icon">
+                </button>
+                <button class="shopping-cart-button" id="itemFavoritesButton">
+                    <span class="shopping-cart-text">Add</span>
+                </button>
+            </div>
+        `;
+
+        item.addEventListener('click', function (itemElement) {
+            if (itemElement.target.id !== 'itemShoppingCartButton' && itemElement.target.id !== 'itemFavoritesButton') {
+                showPopupWindow(itemData, index);
+            }
+        });
+        itemContainerFavorites.appendChild(item);
+    }
+}
+
+function addToShoppingCart(itemData, index) {
+    if (itemData.favorites === false && document.getElementById(`cart_${index}`) === null) {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.id = `cart_${index}`;
+        item.innerHTML = `
+            <img src="${itemData.image}" alt="Example Item Image">
+            <div class="item-price">${itemData.price}</div>
+            <div class="item-description">${itemData.description}</div>
+            <div class="button-row">
+                <button class="favorites-button" id="itemShoppingCartButton">
+                    <img class="favorites-icon" src="/web_files/image_files/iconmonstr-heart-thin.svg" alt="Heart Icon">
+                </button>
+                <button class="shopping-cart-button" id="itemFavoritesButton">
+                    <span class="shopping-cart-text">Add</span>
+                </button>
+            </div>
+        `;
+
+        item.addEventListener('click', function (itemElement) {
+            if (itemElement.target.id !== 'itemShoppingCartButton' && itemElement.target.id !== 'itemFavoritesButton') {
+                showPopupWindow(itemData, index);
+            }
+        });
+        itemContainerShoppingCart.appendChild(item);
+    }
+}
+
+window.onload = generateItemContainerCatalog;
