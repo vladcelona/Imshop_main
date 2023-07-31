@@ -257,7 +257,7 @@ p {
 
 .button-row {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     max-width: 400px; /* Optional - Adjust this to set the maximum width of the button row */
     margin: 0 auto; /* Optional - Centers the button row horizontally */
 }
