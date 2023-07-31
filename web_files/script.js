@@ -108,7 +108,7 @@ function createItem(itemData) {
                 <span class="shopping-cart-text">Add to cart</span>
             </button>
             <button class="favorites-button" id="itemFavoritesButton">
-                <img class="favorites-icon" src="/web_files/image_files/iconmonstr-heart-thin.svg" alt="Heart Icon">
+                <img class="favorites-icon" src="https://raw.githubusercontent.com/vladcelona/Imshop_main/master/web_files/image_files/iconmonstr-heart-thin.svg" alt="Heart Icon">
             </button>
         </div>
     `;
