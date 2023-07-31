@@ -2,6 +2,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap");
 
 /*=============== VARIABLES CSS ===============*/
+
+* {
+    font-family: 'Open Sans', sans-serif;
+}
+
 :root {
     --header-height: 3rem;
 
@@ -257,9 +262,10 @@ p {
 
 .button-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     max-width: 400px; /* Optional - Adjust this to set the maximum width of the button row */
     margin: 0 auto; /* Optional - Centers the button row horizontally */
+    vertical-align: bottom
 }
 
 .fill-button {
@@ -268,7 +274,7 @@ p {
     background-color: darkcyan; /* Replace with your desired button color */
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -285,11 +291,13 @@ p {
 
 .list-item {
     text-align: center;
+    font-family: "Open Sans", serif;
+    font-weight: bold;
     width: calc(50% - 10px);
     padding: 10px;
     margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    background-color: #F7F7F7;
+    border-radius: 10px;
     cursor: pointer;
     float: left;
     display: block;
@@ -297,7 +305,7 @@ p {
 
 .list-item img {
     max-width: 100px;
-    border-radius: 5px;
+    border-radius: 10px;
     display: block;
     margin: 0 auto;
 }
@@ -336,7 +344,7 @@ p {
 
 .popup-image {
     max-width: 100%;
-    border-radius: 5px;
+    border-radius: 10px;
     display: block;
     margin: 0 auto 10px;
 }
@@ -360,9 +368,10 @@ p {
     color: #fff; /* White text color */
     padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
     transition: background-color 0.3s ease;
 }
 
@@ -391,9 +400,10 @@ p {
     color: #fff; /* White text color */
     padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
     transition: background-color 0.3s ease;
 }
 
@@ -414,4 +424,8 @@ p {
 
 #itemShoppingCartButton {
     text-align: center;
+}
+
+.item-description {
+    margin-bottom: 20px;
 }
