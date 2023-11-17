@@ -1,0 +1,10 @@
+SUBDESIGN 'balandin_vladislav_2'
+
+(
+	A, B, C, D: INPUT,
+	Y: OUTPUT
+)
+
+BEGIN
+Y = A & !C # A & !B # A & C & !D # B !& C;
+END;
